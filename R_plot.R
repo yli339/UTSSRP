@@ -1,5 +1,5 @@
 library(dplyr)
-library(ggplot)
+library(ggplot2)
 library(tidyverse)
 df <- as.data.frame(df_complete) 
 colnames(df) <- c("Laureate", "Title", "Prize_Winning", "P_Value", "Gender", 
@@ -18,9 +18,6 @@ phys_p <- phys_p %>%
 
 med_p <- med_p %>%
   mutate(P_bin = cut(P_Value, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE))
-
-nobel_citations_percentile <- df %>% filter(Prize_Winning == "YES") %>%
-  select(Laureate, Citation_Percentile)
 
 
 # Plots over P_value
@@ -48,16 +45,40 @@ med_p_plot <- ggplot(med_p, aes(x = Citation_Percentile)) +
   theme_minimal()
 med_p_plot
 
-#Plots over Laureate (too many!!!maybe need sampling)
+# Plots over Laureate (too many!!!maybe need sampling)
 chem_pl_plot <- chem_p %>%
                 ggplot(aes(x = Citation_Percentile)) +
   geom_histogram(binwidth = 0.05, fill = "red", color = "black") +
-  facet_wrap(~Laureate + P_bin) +
-  geom_vline(data = nobel_citations_percentile, 
-             aes(xintercept = Citation_Percentile),
-             color = "blue", linetype = "dashed", linewidth = 1) +
+  facet_wrap(~Laureate) +
+  geom_vline(data = chem_p, 
+             aes(xintercept = Nobel_Citation_Percentile),
+             color = "blue", linetype = "dashed", linewidth = 0.5) +
   labs(title = "Citation Percentile Distribution by Laureates(Chemistry)",
       x = "Citation Percentile", y = "Count of Papers") +
   theme_minimal()
 chem_pl_plot
+
+phys_pl_plot <- phys_p %>%
+  ggplot(aes(x = Citation_Percentile)) +
+  geom_histogram(binwidth = 0.05, fill = "red", color = "black") +
+  facet_wrap(~Laureate) +
+  geom_vline(data = phys_p, 
+             aes(xintercept = Nobel_Citation_Percentile),
+             color = "blue", linetype = "dashed", linewidth = 0.5) +
+  labs(title = "Citation Percentile Distribution by Laureates(Physics)",
+       x = "Citation Percentile", y = "Count of Papers") +
+  theme_minimal()
+phys_pl_plot
+
+med_pl_plot <- med_p %>%
+  ggplot(aes(x = Citation_Percentile)) +
+  geom_histogram(binwidth = 0.05, fill = "red", color = "black") +
+  facet_wrap(~Laureate) +
+  geom_vline(data = med_p, 
+             aes(xintercept = Nobel_Citation_Percentile),
+             color = "blue", linetype = "dashed", linewidth = 0.5) +
+  labs(title = "Citation Percentile Distribution by Laureates(Medicine)",
+       x = "Citation Percentile", y = "Count of Papers") +
+  theme_minimal()
+med_pl_plot
 
