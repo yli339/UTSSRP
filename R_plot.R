@@ -104,10 +104,10 @@ med_pl_plot
 chem_st <- chem_p %>% filter(Laureate == "stoddart, j")
 st_plot <- chem_st %>%
   ggplot(aes(x = Citations_Count)) +
-  geom_histogram(binwidth = 50, fill = "red", color = "black") +
+  geom_histogram(binwidth = 50, fill = "blue", color = "black") +
   geom_vline(data = chem_st, 
-             aes(xintercept = Nobel_Citation_Percentile),
-             color = "blue", linetype = "dashed", linewidth = 0.5) +
+             aes(xintercept = 2247),
+             color ="black", linetype = "dashed", linewidth = 0.5) +
   labs(title = "Citation Counts Distribution by Laureates(stoddart, j)",
        x = "Citation Counts", y = "Count of Papers") +
   theme_minimal()
@@ -156,8 +156,8 @@ med_model <- lm(Citation_Percentile ~ P_Value, data = data_med)
 summary(med_model)
 
 lm_combine_plot <- ggplot(combine_p, aes(x = P_Value, y = Citation_Percentile)) +
-  geom_point(color = "red") +
-  geom_smooth(method = "lm", color = "blue", se = FALSE) +
+  geom_point(color = "blue") +
+  geom_smooth(method = "lm", color = "black", se = FALSE) +
   labs(title = "Linear Regression: Citation Percentile vs Relative Position",
        x = "Relative Position", y = "Citation Percentile") +
   theme_minimal()
@@ -178,6 +178,14 @@ summary(overall_model_1)
 
 
 # Histogram binned by Publication Year
+combine_d <- combine_p %>%
+  filter(!is.na(Publication_Year)) %>%
+  mutate(
+    decade_start = floor((Publication_Year - 1) / 10) * 10,
+    decade_end = decade_start + 10,
+    decade_bin = paste0(decade_start, "–", decade_end)
+  )
+
 decade_plot_ci <- ggplot(combine_d, aes(x = Citation_Percentile)) +
   geom_histogram(binwidth = 0.05, fill = "blue", color = "black") +
   facet_wrap(~decade_bin, ncol = 5, scales = "free_y") +
@@ -186,22 +194,15 @@ decade_plot_ci <- ggplot(combine_d, aes(x = Citation_Percentile)) +
   theme_minimal()
 decade_plot_ci
 
+
 decade_plot_p <- ggplot(combine_d, aes(x = P_Value)) +
   geom_histogram(binwidth = 0.05, fill = "blue", color = "black") +
   facet_wrap(~decade_bin, ncol = 5, scales = "free_y") +
   labs(title = "Relative Position Distribution binned by Decade",
        x = "Relative Position", y = "Count of Nobel_Prize Papers") +
   theme_minimal()
-decade_plot_p
 
-decade_combine_p <- ggplot(combine_d, aes(x = P_Value, y = Citation_Percentile)) +
-  geom_point() +
-  geom_smooth(method = "lm", color = "blue", se = FALSE) +
-  facet_wrap(~decade_bin, ncol = 5, scales = "free_y") +
-  labs(title = "Relative Position vs Citation Percentile binned by Decade",
-       x = "Relative Position", y = "Citation Percentile") +
-  theme_minimal()
-decade_combine_p
+decade_plot_p
 
 
 # Binned by Gender
@@ -224,8 +225,8 @@ gender_plot_p
 
 
 gender_combine_p <- ggplot(combine_d, aes(x = P_Value, y = Citation_Percentile)) +
-  geom_point() +
-  geom_smooth(method = "lm", color = "blue", se = FALSE) +
+  geom_point(color = "blue") +
+  geom_smooth(method = "lm", color = "black", se = FALSE) +
   facet_wrap(~Gender, ncol = 5, scales = "free_y") +
   labs(title = "Relative Position vs Citation Percentile binned by Gender",
        x = "Relative Position", y = "Citation Percentile") +
